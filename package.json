@@ -1,0 +1,19 @@
+{
+  "name": "spreadjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.16.4",
+    "promise-polyfill": "^8.1.0",
+    "request": "^2.88.0",
+    "ringtail-extension-sdk": "^0.9.7",
+    "whatwg-fetch": "^3.0.0"
+  }
+}
