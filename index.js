@@ -5,7 +5,7 @@ var request = require('request');
 const app = express();
 
 app.get('/hello', (req, res) => {
-    fs.readFile("views/index.html", function (error, pgResp) {
+    fs.readFile("index.html", function (error, pgResp) {
         if (error) {
             res.writeHead(404);
             res.write('Contents you are looking are Not Found');
