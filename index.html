@@ -1,0 +1,114 @@
+
+<html style="height:100%;font-size:14px;">
+
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <link rel="styleSheet" href="https://cdn.grapecity.com/spreadjs/hosted/css/gc.spread.sheets.excel2016colorful.10.1.1.css  " /> 
+    <script src="https://cdn.grapecity.com/spreadjs/hosted/scripts/gc.spread.sheets.all.10.1.1.min.js " type="text/javascript"></script>
+</head>
+
+<body style='font-size:14px; padding: 20px'>
+    <h2>Information about users </h2>
+    <div id="ss" style="width:100%; height:200px;border: 1px solid white;"></div>
+    <h2>Information about case statistics</h2>
+    <div id="ss1" style="width:100%; height:400px;border: 1px solid white;"></div>
+    <div id="data" style="color:white;" >Something</div>
+</body>
+<script type="text/javascript">
+ 
+    window.onload= function() {
+        var users = [];
+        var userData = $.get("http://localhost:8080/getData", function(data, status){
+              document.getElementById("data").innerHTML=data; 
+          }).done(function(){
+            var newData =data; 
+            var users = JSON.parse(newData.innerText).data.users;
+            var fullName = { name: "fullName", displayName: "Last, First Name", size: "250" };  
+            var userName = { name: "userName", displayName: "User Name", size: "150" };  
+            var email = { name: "email", displayName: "Email", size: "400" };  
+            var companyName = { name: "companyName", displayName: "Company Name", size: "250" };  
+            var lastLogin = { name: "lastLogin", displayName: "Last Login Date", size: "250",formatter:"d/M/yy" };  
+            var licenses = { name: "licenses", displayName: "Licenses", size: "75" };  
+            var disabled = { name: "disabled", displayName: "Acive", size: "75" };  
+            var activeCases = { name: "activeCase", displayName: "Active Cases", size: "250" };  
+            var organization = { name: "organization", displayName: "Organization", size: "250" };  
+
+            var spread = new GC.Spread.Sheets.Workbook(document.getElementById("ss"), { sheetCount: 1 });
+            var sheet = spread.getSheet(0);
+
+            sheet.setDataSource(users);
+            sheet.bindColumn(0, fullName); 
+            sheet.bindColumn(1, userName); 
+            sheet.bindColumn(2, email); 
+            sheet.bindColumn(3, companyName); 
+            sheet.bindColumn(4, licenses); 
+            sheet.bindColumn(5, disabled); 
+            sheet.bindColumn(6, lastLogin);
+            sheet.bindColumn(7, activeCases);
+            sheet.bindColumn(8, organization);
+            var comment = sheet.comments.add(1,6,"User hasn't logged in in more than 30 days!!");
+            comment.text("User hasn't logged in in more than 30 days!!");
+            comment.backColor("red");
+            comment.displayMode(GC.Spread.Sheets.Comments.DisplayMode.AlwaysShown);
+            var row = sheet.getRowCount();
+            var column = sheet.getColumnCount();
+            sheet.addColumns(column, 5)
+            sheet.addRows(row, 2);
+            //call for perf 
+            spread.isPaintSuspended(false);  
+        });
+        var userDataCase = $.get("http://localhost:8080/getDataCases", function(data, status){
+              document.getElementById("data").innerHTML=data; 
+          }).done(function(){
+            var newData =data; 
+              cases = JSON.parse(newData.innerText).data.cases;
+
+            var caseName = { name: "caseName", displayName: "Case Name", size: "200" };
+            var countOfIngestionDocs = { name: "countOfIngestionDocs", displayName: "Ingestion Doc Count", formatter:"#,#",size: "150" };   
+            var sizeOfBaseDocumentsHostedDetails = { name: "sizeOfBaseDocumentsHostedDetails", displayName: "Base Document hosting",formatter:"#,#", size: "150" };  
+            var sizeOfFolderData_Ingest_Temp = { name: "sizeOfFolderData_Ingest_Temp", displayName: "Size of IngestTemp",formatter:"#,#", size: "150" };  
+            var sizeOfFolderData_Upload = { name: "sizeOfFolderData_Upload", displayName: "Size of Upload",formatter:"#,#", size: "150" };  
+            var sizeOfNonDocumentData = { name: "sizeOfNonDocumentData", displayName: "Non Document size", size: "250",formatter:"#,#" };  
+
+            var spread = new GC.Spread.Sheets.Workbook(document.getElementById("ss1"), { sheetCount: 1 });
+            var sheet = spread.getSheet(0);
+
+
+         
+            var dataarry = [];
+
+            cases.forEach(element  => {
+                var temp =[];
+                temp = element.statistics ;
+                temp.caseName = element.name; 
+                dataarry.push(temp); 
+            });
+            var comment = sheet.comments.add(4,4,"This Looks really large!!");
+            comment.text("This Looks really large!!");
+            comment.backColor("red");
+            comment.displayMode(GC.Spread.Sheets.Comments.DisplayMode.AlwaysShown);
+
+            sheet.autoGenerateColumns=false;
+            sheet.setDataSource(dataarry);
+            sheet.bindColumn(0, caseName); 
+            sheet.bindColumn(1, countOfIngestionDocs); 
+            sheet.bindColumn(2, sizeOfBaseDocumentsHostedDetails); 
+            sheet.bindColumn(3, sizeOfFolderData_Ingest_Temp); 
+            sheet.bindColumn(4, sizeOfNonDocumentData); 
+            sheet.bindColumn(5, sizeOfFolderData_Upload); 
+            sheet.frozenColumnCount(1);
+
+            var row = sheet.getRowCount();
+            var column = sheet.getColumnCount();
+            var cell = sheet.getCell(1, 2);
+            sheet.getRange(10, 0, 1, 6).borderBottom(new GC.Spread.Sheets.LineBorder("#000",GC.Spread.Sheets.LineStyle.thin));
+            sheet.addColumns(column, 5)
+            sheet.addRows(row, 15);
+
+            spread.isPaintSuspended(false);  
+        });
+    };
+    </script>
+</html>
